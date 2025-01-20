@@ -1,0 +1,576 @@
+load model-checker .
+
+
+*** SISTEMA
+***************************
+fmod SISTEMA is
+    pr STRING .
+    pr NAT .
+    pr BOOL .
+
+
+    *** Definición tipo Ciudad
+    sort Ciudad . 
+		op ciudadVacia : -> Ciudad [ctor] .
+		op __ : Ciudad Ciudad -> Ciudad [ctor assoc comm id: ciudadVacia] .
+
+    
+
+    *** Definición tipo SItio
+    sort Sitio .
+        subsort Sitio < Ciudad .
+        op {_ <_>} : NombreSitio ListaPersonas -> Sitio [ctor] .
+
+    sort SitioLocal .
+        subsort SitioLocal < Sitio .
+        op {_ ; aforo: _ ; precioRefresco: _ ; precioCopa: _ ; interior<_> ; entrada<_>} : NombreSitio Aforo Precio Precio ListaPersonas ListaPersonas -> Sitio [ctor] .
+
+        sort NombreSitio .
+            op zona residencial : -> NombreSitio [ctor] .
+            op plaza mayor : -> NombreSitio [ctor] .
+            op local de moda : -> NombreSitio [ctor] .
+            op recreativos : -> NombreSitio [ctor] .
+
+        sort Aforo .
+            subsort  Nat < Aforo .
+
+        sort Precio .
+            subsort Nat < Precio .
+
+        sort ListaPersonas . 
+            op ListaPersonasVacia : -> ListaPersonas [ctor] .
+            op __ : ListaPersonas ListaPersonas -> ListaPersonas [ctor assoc comm id: ListaPersonasVacia] .
+
+
+
+    *** Definición tipo Personas
+    sort Persona .
+        subsort Persona < ListaPersonas .
+
+    sort Cliente .
+        subsort Cliente < Persona .
+        op [cliente | nombre: _ - edad: _ - estado: _ - dinero: _ - bebidas: _ - _] : nombrePersona Edad Estado Dinero Bebidas TieneEntrada? -> Cliente [ctor] .
+
+    sort TrabajadorRelacciones .
+        subsort TrabajadorRelacciones < Persona .
+        op [trabajador relacciones | nombre: _ - estado: _ - dinero: _ - entradas: _ - precio: _] : nombrePersona Estado Dinero NumeroEntradas PrecioEntrada -> TrabajadorRelacciones [ctor] .
+
+    sort TrabajadorPuertas .
+        subsort TrabajadorPuertas < Persona .
+        op [trabajador puertas | nombre: _ - estado: _ - dinero: _ - bebidas:_] : nombrePersona Estado Dinero Bebidas -> TrabajadorPuertas [ctor] .
+
+
+        sort nombrePersona .
+            subsort String < nombrePersona .
+            op nombreP'ersona : String -> nombrePersona [ctor] .
+
+        sort Edad .
+            subsort Nat < Edad .
+            op edad : Nat -> Edad .
+
+        sort Estado .
+            op relajado : -> Estado [ctor] .
+            op cansado pero contento : -> Estado [ctor] .
+            op ebrio : -> Estado [ctor] .
+            op humillado : -> Estado [ctor] .
+            op satisfecho : -> Estado [ctor] .
+            op trabajando : -> Estado [ctor] .
+
+        sort Dinero .
+            subsort Nat < Dinero .
+            op dinero : Nat -> Dinero [ctor] .
+
+        sort Bebidas .
+            subsort Nat < Bebidas .
+            op bebidas : Nat -> Bebidas [ctor] .
+
+        sort TieneEntrada? .
+            subsort Bool < TieneEntrada? .
+            op con entrada : -> TieneEntrada? [ctor] .
+            op sin entrada : -> TieneEntrada? [ctor] .
+
+        sort NumeroEntradas .
+            subsort Nat < NumeroEntradas .
+
+        sort PrecioEntrada .
+            subsort Nat < PrecioEntrada .
+            
+
+    *** Definición funciones
+    var lP : ListaPersonas .
+    var P : Persona .
+    var edad : Edad .
+    var maxAforo : Aforo .
+    var numPersonas : Nat .
+
+	op numPersonas : ListaPersonas -> Nat .
+		eq numPersonas(ListaPersonasVacia) = 0 .
+		eq numPersonas(P lP) = 1 + numPersonas(lP) . 
+
+    op mayorEdad? : Nat -> Bool .
+        ceq mayorEdad?(edad) = true 
+            if edad >= 18 .
+        ceq mayorEdad?(edad) = false 
+            if edad < 18 .
+
+    op hayAforo? : Aforo Nat -> Bool .
+        ceq hayAforo?(maxAforo, numPersonas) = true 
+            if maxAforo > numPersonas .
+        ceq hayAforo?(maxAforo, numPersonas) = false 
+            if maxAforo <= numPersonas .
+
+    op tieneEntradaCheck? : TieneEntrada? -> Bool .
+            eq tieneEntradaCheck?(con entrada) = true .
+            eq tieneEntradaCheck?(sin entrada) = false .
+
+endfm
+
+
+
+
+*** MODULO COMPORTAMIENTO
+***************************
+mod COMPORTAMIENTO is
+    pr SISTEMA .
+
+    var lP' lP'' lP''' : ListaPersonas .
+    var aforo' aforo'' : Aforo .
+    var precio' precio'' : Precio .
+
+    var nombreP' nombreP'' : nombrePersona .
+    var edadP' edadP'' : Edad .
+    var estadoP' estadoP'' : Estado .
+    var dineroP' dineroP'' : Dinero .
+    var bebidasP' bebidasP'' : Bebidas .
+    var entrada?' entrada?'' : TieneEntrada? .
+    var numE : NumeroEntradas .
+    var precioE : PrecioEntrada .
+
+
+
+    *** Definición de reglas para ZONA RESIDENCIAL ***
+    **************************************************
+    rl [zonaResidendial=>plazaMayor] :
+        {zona residencial < lP' [cliente | nombre: nombreP' - edad: edadP' - estado: relajado - dinero: dineroP' - bebidas: bebidasP' - entrada?']> } 
+        {plaza mayor < lP'' > }
+    =>
+        {zona residencial < lP' > }
+        {plaza mayor < lP'' [cliente | nombre: nombreP' - edad: edadP' - estado: relajado - dinero: dineroP' - bebidas: bebidasP' - entrada?']> } .
+
+
+    rl [zonaResidendial=>localDeModa] :
+        {zona residencial < lP' [cliente | nombre: nombreP' - edad: edadP' - estado: relajado - dinero: dineroP' - bebidas: bebidasP' - entrada?']> } 
+        {local de moda ; aforo: aforo' ; precioRefresco: precio' ; precioCopa: precio'' ; 
+                        interior< lP'' > ; 
+                        entrada< lP''' > }
+    =>
+        {zona residencial < lP' > }
+        {local de moda ; aforo: aforo' ; precioRefresco: precio' ; precioCopa: precio'' ; 
+                        interior< lP'' > ; 
+                        entrada< lP''' [cliente | nombre: nombreP' - edad: edadP' - estado: relajado - dinero: dineroP' - bebidas: bebidasP' - entrada?']> } .
+
+
+    rl [zonaResidendial=>recreativos] :
+        {zona residencial < lP' [cliente | nombre: nombreP' - edad: edadP' - estado: relajado - dinero: dineroP' - bebidas: bebidasP' - entrada?']> } 
+        {recreativos < lP'' > }
+    =>
+        {zona residencial < lP' > }
+        {recreativos < lP'' [cliente | nombre: nombreP' - edad: edadP' - estado: relajado - dinero: dineroP' - bebidas: bebidasP' - entrada?']> } .
+
+
+
+    *** Definición de reglas para PLAZA MAYOR ***
+    *********************************************
+    crl [comprarEntrada] :
+        {plaza mayor < [trabajador relacciones | nombre: nombreP' - estado: trabajando - dinero: dineroP' - entradas: numE - precio: precioE] 
+                    [cliente | nombre: nombreP'' - edad: edadP'' - estado: estadoP'' - dinero: dineroP'' - bebidas: bebidasP'' - sin entrada] lP' > } 
+    =>
+        {plaza mayor < [trabajador relacciones | nombre: nombreP' - estado: trabajando - dinero: (dineroP' + precioE) - entradas: sd(numE, 1) - precio: (precioE + 5)] 
+                    [cliente | nombre: nombreP'' - edad: edadP'' - estado: estadoP'' - dinero: sd(dineroP'', precioE) - bebidas: bebidasP'' - con entrada] lP' > } 
+    if dineroP'' >= precioE and numE >= 1 .
+
+
+    rl [plazaMayor=>recreativos] :
+        {plaza mayor < lP' [cliente | nombre: nombreP' - edad: edadP' - estado: estadoP' - dinero: dineroP' - bebidas: bebidasP' - entrada?']> } 
+        {recreativos < lP'' > }
+    =>
+        {plaza mayor < lP' > }
+        {recreativos < lP'' [cliente | nombre: nombreP' - edad: edadP' - estado: estadoP' - dinero: dineroP' - bebidas: bebidasP' - entrada?']> } .
+
+
+    rl [plazaMayor=>localDeModa] :
+        {plaza mayor < lP' [cliente | nombre: nombreP' - edad: edadP' - estado: estadoP' - dinero: dineroP' - bebidas: bebidasP' - entrada?']> } 
+        {local de moda ; aforo: aforo' ; precioRefresco: precio' ; precioCopa: precio'' ; 
+                        interior< lP'' > ; 
+                        entrada< lP''' > }
+    =>
+        {plaza mayor < lP' > }
+        {local de moda ; aforo: aforo' ; precioRefresco: precio' ; precioCopa: precio'' ; 
+                        interior< lP'' > ; 
+                        entrada< lP''' [cliente | nombre: nombreP' - edad: edadP' - estado: estadoP' - dinero: dineroP' - bebidas: bebidasP' - entrada?']> } .
+    
+
+
+    *** Definición de reglas para LOCAL DE MODA ***
+    ***********************************************
+    crl [ajustarCola] :
+        {local de moda ; aforo: aforo' ; precioRefresco: precio' ; precioCopa: precio'' ; 
+                        interior< lP' > ; 
+                        entrada< lP''   [cliente | nombre: nombreP' - edad: edadP' - estado: estadoP' - dinero: dineroP' - bebidas: bebidasP' - entrada?'] 
+                                        [cliente | nombre: nombreP'' - edad: edadP'' - estado: estadoP'' - dinero: dineroP'' - bebidas: bebidasP'' - entrada?''] 
+                                lP''' > } 
+    =>
+        {local de moda ; aforo: aforo' ; precioRefresco: precio' ; precioCopa: precio'' ;
+                        interior< lP' > ;
+                        entrada< lP''   [cliente | nombre: nombreP'' - edad: edadP'' - estado: estadoP'' - dinero: dineroP'' - bebidas: bebidasP'' - entrada?'']
+                                        [cliente | nombre: nombreP' - edad: edadP' - estado: estadoP' - dinero: dineroP' - bebidas: bebidasP' - entrada?'] 
+                                lP''' > }  
+    if (dineroP'' > dineroP') .
+
+
+    crl [aceptado] :
+        {local de moda ; aforo: aforo' ; precioRefresco: precio' ; precioCopa: precio'' ; 
+                        interior< lP' > ; 
+                        entrada< [cliente | nombre: nombreP' - edad: edadP' - estado: estadoP' - dinero: dineroP' - bebidas: bebidasP' - entrada?'] lP'' > } 
+    =>
+        {local de moda ; aforo: aforo' ; precioRefresco: precio' ; precioCopa: precio'' ; 
+                        interior< lP' [cliente | nombre: nombreP' - edad: edadP' - estado: estadoP' - dinero: dineroP' - bebidas: bebidasP' - entrada?']> ; 
+                        entrada< lP'' > }
+    if  mayorEdad?(edadP') and tieneEntradaCheck?(entrada?') and hayAforo?(aforo', numPersonas(lP'))  .
+
+
+    crl [rechazado] :
+        {local de moda ; aforo: aforo' ; precioRefresco: precio' ; precioCopa: precio'' ; 
+                        interior< lP' > ; 
+                        entrada< [cliente | nombre: nombreP' - edad: edadP' - estado: estadoP' - dinero: dineroP' - bebidas: bebidasP' - entrada?'] lP'' > } 
+        {plaza mayor < lP''' > } 
+    =>
+        {local de moda ; aforo: aforo' ; precioRefresco: precio' ; precioCopa: precio'' ; 
+                        interior< lP' > ; 
+                        entrada< lP'' > } 
+        {plaza mayor < lP''' [cliente | nombre: nombreP' - edad: edadP' - estado: estadoP' - dinero: dineroP' - bebidas: bebidasP' - entrada?']> }
+    if (not mayorEdad?(edadP')) or ( not tieneEntradaCheck?(entrada?')) or (not hayAforo?(aforo', numPersonas(lP'))) .
+ 
+
+   crl [comprarRefresco-cliente] :
+        {local de moda ; aforo: aforo' ; precioRefresco: precio' ; precioCopa: precio'' ; 
+                        interior< lP' [cliente | nombre: nombreP' - edad: edadP' - estado: estadoP' - dinero: dineroP' - bebidas: bebidasP' - entrada?'] lP''' > ; 
+                        entrada< lP'' > } 
+    =>
+        {local de moda ; aforo: aforo' ; precioRefresco: precio' ; precioCopa: precio'' ; 
+                        interior< lP' [cliente | nombre: nombreP' - edad: edadP' - estado: estadoP' - dinero: sd(dineroP', precio') - bebidas: bebidasP' - entrada?'] lP''' > ; 
+                        entrada< lP'' > } 
+    if dineroP' >= precio' .
+
+
+    crl [comprarRefresco-puerta] :
+        {local de moda ; aforo: aforo' ; precioRefresco: precio' ; precioCopa: precio'' ; 
+                        interior< lP' [trabajador puertas | nombre: nombreP' - estado: trabajando - dinero: dineroP' - bebidas: bebidasP'] lP''' > ; 
+                        entrada< lP'' > } 
+    =>
+        {local de moda ; aforo: aforo' ; precioRefresco: precio' ; precioCopa: precio'' ; 
+                        interior< lP' [trabajador puertas | nombre: nombreP' - estado: trabajando - dinero: sd(dineroP', precio') - bebidas: bebidasP'] lP''' > ; 
+                        entrada< lP'' > }
+    if dineroP' >= precio' .
+
+
+    crl [comprarCopa-cliente] :
+        {local de moda ; aforo: aforo' ; precioRefresco: precio' ; precioCopa: precio'' ; 
+                        interior< lP' [cliente | nombre: nombreP' - edad: edadP' - estado: estadoP' - dinero: dineroP' - bebidas: bebidasP' - entrada?'] lP''' > ; 
+                        entrada< lP'' > } 
+    =>
+        {local de moda ; aforo: aforo' ; precioRefresco: precio' ; precioCopa: precio'' ; 
+                        interior< lP' [cliente | nombre: nombreP' - edad: edadP' - estado: estadoP' - dinero: sd(dineroP', precio'') - bebidas: (bebidasP' + 1) - entrada?'] lP''' > ; 
+                        entrada< lP'' > }
+    if (bebidasP' + 1) < 4 and dineroP' >= precio' .
+
+
+    crl [comprarCopa-cliente] :
+        {local de moda ; aforo: aforo' ; precioRefresco: precio' ; precioCopa: precio'' ; 
+                        interior< lP' [cliente | nombre: nombreP' - edad: edadP' - estado: estadoP' - dinero: dineroP' - bebidas: bebidasP' - entrada?'] lP''' > ; 
+                        entrada< lP'' > } 
+    =>
+        {local de moda ; aforo: aforo' ; precioRefresco: precio' ; precioCopa: precio'' ; 
+                        interior< lP' [cliente | nombre: nombreP' - edad: edadP' - estado: ebrio - dinero: sd(dineroP', precio'') - bebidas: (bebidasP' + 1) - entrada?'] lP''' > ; 
+                        entrada< lP'' > }
+    if ( (bebidasP' + 1) >= 4 ) and (dineroP' >= precio'') .
+
+
+    rl [expulsado] :
+        {local de moda ; aforo: aforo' ; precioRefresco: precio' ; precioCopa: precio'' ; 
+                        interior< lP' [cliente | nombre: nombreP' - edad: edadP' - estado: ebrio - dinero: dineroP' - bebidas: bebidasP' - entrada?'] > ; 
+                        entrada< lP'' > } 
+        {zona residencial < lP''' > }
+    =>
+        {local de moda ; aforo: aforo' ; precioRefresco: precio' ; precioCopa: precio'' ; 
+                        interior< lP' > ; 
+                        entrada< lP'' > } 
+        {zona residencial < lP'''  [cliente | nombre: nombreP' - edad: edadP' - estado: ebrio - dinero: dineroP' - bebidas: bebidasP' - entrada?']> }.
+
+
+    rl [localDeModa=>zonaResidencial-ebrio] :
+        {local de moda ; aforo: aforo' ; precioRefresco: precio' ; precioCopa: precio'' ; 
+                        interior< lP' [cliente | nombre: nombreP' - edad: edadP' - estado: ebrio - dinero: dineroP' - bebidas: bebidasP' - entrada?'] > ; 
+                        entrada< lP'' > } 
+        {zona residencial < lP''' > }
+    =>
+        {local de moda ; aforo: aforo' ; precioRefresco: precio' ; precioCopa: precio'' ; 
+                        interior< lP' > ; 
+                        entrada< lP'' > } 
+        {zona residencial < lP'''  [cliente | nombre: nombreP' - edad: edadP' - estado: ebrio - dinero: dineroP' - bebidas: bebidasP' - entrada?']> }.
+
+
+    rl [localDeModa=>zonaResidencial-cansado] :
+        {local de moda ; aforo: aforo' ; precioRefresco: precio' ; precioCopa: precio'' ; 
+                        interior< lP' [cliente | nombre: nombreP' - edad: edadP' - estado: relajado - dinero: dineroP' - bebidas: bebidasP' - entrada?'] > ; 
+                        entrada< lP'' > } 
+        {zona residencial < lP''' > }
+    =>
+        {local de moda ; aforo: aforo' ; precioRefresco: precio' ; precioCopa: precio'' ; 
+                        interior< lP' > ; 
+                        entrada< lP'' > } 
+        {zona residencial < lP'''  [cliente | nombre: nombreP' - edad: edadP' - estado: cansado pero contento - dinero: dineroP' - bebidas: bebidasP' - entrada?']> }.
+
+
+    *** Definición de reglas para RECREATIVOS ***
+    *********************************************
+    rl [jugarPartida1] :
+        {recreativos < lP' [cliente | nombre: nombreP' - edad: edadP' - estado: estadoP' - dinero: dineroP' - bebidas: bebidasP' - entrada?'] 
+                            [cliente | nombre: nombreP'' - edad: edadP'' - estado: estadoP'' - dinero: dineroP'' - bebidas: bebidasP'' - entrada?'']> }
+        {zona residencial < lP'' > } 
+    =>
+        {recreativos < lP' > }
+        {zona residencial < lP'' [cliente | nombre: nombreP' - edad: edadP' - estado: satisfecho - dinero: dineroP' - bebidas: bebidasP' - entrada?'] 
+                                [cliente | nombre: nombreP'' - edad: edadP'' - estado: humillado - dinero: dineroP'' - bebidas: bebidasP'' - entrada?'']> } .
+
+
+    rl [jugarPartida2] :
+        {recreativos < lP' [cliente | nombre: nombreP' - edad: edadP' - estado: estadoP' - dinero: dineroP' - bebidas: bebidasP' - entrada?'] 
+                            [cliente | nombre: nombreP'' - edad: edadP'' - estado: estadoP'' - dinero: dineroP'' - bebidas: bebidasP'' - entrada?'']> }
+        {zona residencial < lP'' > } 
+    =>
+        {recreativos < lP' > }
+        {zona residencial < lP'' [cliente | nombre: nombreP' - edad: edadP' - estado: humillado - dinero: dineroP' - bebidas: bebidasP' - entrada?'] 
+                                [cliente | nombre: nombreP'' - edad: edadP'' - estado: satisfecho - dinero: dineroP'' - bebidas: bebidasP'' - entrada?'']> } .
+
+
+
+endm
+
+
+
+
+*** MODULO EJEMPLO
+***************************
+mod EJEMPLO is
+	pr SISTEMA .
+	pr COMPORTAMIENTO .
+
+	op init : -> Ciudad .
+		eq init =   {zona residencial < [cliente | nombre: "Pepe" - edad: 25 - estado: relajado - dinero: 40  - bebidas: 0 - sin entrada]
+                                        [cliente | nombre: "Juan" - edad: 42 - estado: relajado - dinero: 70  - bebidas: 0 - sin entrada]
+                                        [cliente | nombre: "Maria" - edad: 27 - estado: relajado - dinero: 63  - bebidas: 0 - sin entrada]
+                                        [cliente | nombre: "Antonio" - edad: 55 - estado: relajado - dinero: 140  - bebidas: 0 - sin entrada]
+                                        [cliente | nombre: "Ana" - edad: 16 - estado: relajado - dinero: 25  - bebidas: 0 - sin entrada]
+                                        [cliente | nombre: "Cristina" - edad: 23 - estado: relajado - dinero: 32  - bebidas: 0 - sin entrada]
+                                        [cliente | nombre: "Alejandro" - edad: 15 - estado: relajado - dinero: 12  - bebidas: 0 - sin entrada] 
+                                        [cliente | nombre: "Pedro" - edad: 32 - estado: relajado - dinero: 47  - bebidas: 0 - sin entrada]> } 
+                    { plaza mayor < [trabajador relacciones | nombre: "Billy" - estado: trabajando - dinero: 0 - entradas: 10 - precio: 5]> } 
+                    { local de moda ; aforo: 5 ; precioRefresco: 3 ; precioCopa: 6 ;
+                                                interior< [trabajador puertas | nombre: "Bokencio" - estado: trabajando - dinero: 70 - bebidas: 0]> ; 
+                                                entrada< ListaPersonasVacia >}
+                    { recreativos < ListaPersonasVacia > } .
+
+
+endm 
+
+
+*** EJEMPLO DE EJECUCIÓN
+frew init .
+
+
+
+*** MODULO PROPS
+***************************
+mod PROPS is
+	pr SATISFACTION .
+	pr COMPORTAMIENTO .
+    pr SISTEMA .
+
+    subsort Ciudad < State .
+
+    var rest : Ciudad .
+    var lP' lP'' lP''' : ListaPersonas .
+    var aforo' aforo'' : Aforo .
+    var precio' precio'' : Precio .
+
+    var nombreP' nombreP'' : nombrePersona .
+    var edadP' edadP'' : Edad .
+    var estadoP' estadoP'' : Estado .
+    var dineroP' dineroP'' : Dinero .
+    var bebidasP' bebidasP'' : Bebidas .
+    var entrada?' entrada?'' : TieneEntrada? .
+    var numE : NumeroEntradas .
+    var precioE : PrecioEntrada .
+
+ 
+    *** A) Comprieba si hay gente en el local de moda
+	op prop-alguienEnLocal? : -> Prop [ctor] .
+        eq {local de moda ; aforo: aforo' ; precioRefresco: precio' ; precioCopa: precio'' ; 
+                    interior< lP' > ; 
+                    entrada< lP'' > } 
+            rest |= prop-alguienEnLocal? = numPersonas(lP') =/= 1 .
+ 	 
+
+    *** B) Comprueba si una persona concreta esta en el local de moda
+	op prop-estaEnLocal? : nombrePersona -> Prop [ctor] .
+		eq {local de moda ; aforo: aforo' ; precioRefresco: precio' ; precioCopa: precio'' ; 
+                        interior< lP' [cliente | nombre: nombreP' - edad: edadP' - estado: estadoP' - dinero: dineroP' - bebidas: bebidasP' - entrada?']> ; 
+                        entrada< lP'' > } 
+            rest |= prop-estaEnLocal?(nombreP') = true .
+
+
+    *** C) Comprueba si una persona concreta esta en los recreativos
+	op prop-estaEnRecreativos? : nombrePersona -> Prop [ctor] .
+        eq {recreativos < lP' [cliente | nombre: nombreP' - edad: edadP' - estado: estadoP' - dinero: dineroP' - bebidas: bebidasP' - entrada?']> }
+            rest |= prop-estaEnRecreativos?(nombreP') = true .
+
+
+    *** D) Comprueba si hay alguien ebrio en cualquier lugar
+    op prop-alguienEbrio? : -> Prop [ctor] .
+        eq {local de moda ; aforo: aforo' ; precioRefresco: precio' ; precioCopa: precio'' ; 
+                                interior< lP' [cliente | nombre: nombreP' - edad: edadP' - estado: ebrio - dinero: dineroP' - bebidas: bebidasP' - entrada?']> ; 
+                                entrada< lP'' > } 
+            rest |= prop-alguienEbrio? = true .
+        eq {zona residencial < lP'' [cliente | nombre: nombreP' - edad: edadP' - estado: ebrio - dinero: dineroP' - bebidas: bebidasP' - entrada?']> }
+            rest |= prop-alguienEbrio? = true .
+
+
+    *** E) Comprueba si hay alguien concreto ebrio en cualquier lugar
+    op prop-estaEbrio? : nombrePersona -> Prop [ctor] .
+        eq {local de moda ; aforo: aforo' ; precioRefresco: precio' ; precioCopa: precio'' ; 
+                                interior< lP' [cliente | nombre: nombreP' - edad: edadP' - estado: ebrio - dinero: dineroP' - bebidas: bebidasP' - entrada?']> ; 
+                                entrada< lP'' > } 
+            rest |= prop-estaEbrio?(nombreP') = true .
+        eq {zona residencial < lP'' [cliente | nombre: nombreP' - edad: edadP' - estado: ebrio - dinero: dineroP' - bebidas: bebidasP' - entrada?']> }
+            rest |= prop-estaEbrio?(nombreP') = true .
+
+
+    *** F) Comprueba si hay alguien concreto con entrada
+    op prop-alguienConEntrada? : nombrePersona -> Prop [ctor] .
+        eq {plaza mayor < lP' [cliente | nombre: nombreP' - edad: edadP' - estado: estadoP' - dinero: dineroP' - bebidas: bebidasP' - con entrada]> }  
+            rest |= prop-alguienConEntrada?(nombreP') = true .
+
+
+
+                  
+endm
+
+
+
+*** MODULO TEST
+***************************
+mod TEST is
+	pr MODEL-CHECKER .
+	pr LTL-SIMPLIFIER .
+	pr PROPS .
+
+    op initCheck : -> Ciudad .
+        eq initCheck =   {zona residencial <[cliente | nombre: "Pepe" - edad: 25 - estado: relajado - dinero: 40  - bebidas: 0 - sin entrada]
+                                            [cliente | nombre: "Pedro" - edad: 32 - estado: ebrio - dinero: 47  - bebidas: 0 - sin entrada]> } 
+                        { plaza mayor < [trabajador relacciones | nombre: "Billy" - estado: trabajando - dinero: 0 - entradas: 10 - precio: 5]
+                                        [cliente | nombre: "Cristina" - edad: 23 - estado: relajado - dinero: 32  - bebidas: 0 - con entrada]> } 
+                        { local de moda ; aforo: 5 ; precioRefresco: 3 ; precioCopa: 6 ;
+                                        interior<   [trabajador puertas | nombre: "Bokencio" - estado: trabajando - dinero: 70 - bebidas: 0] 
+                                                    [cliente | nombre: "Marco" - edad: 25 - estado: ebrio - dinero: 40  - bebidas: 0 - con entrada]> ; 
+                                        entrada< ListaPersonasVacia >}
+                        { recreativos < [cliente | nombre: "Maria" - edad: 27 - estado: relajado - dinero: 63  - bebidas: 0 - sin entrada] > } .
+
+
+	op init : -> Ciudad .
+		eq init =   {zona residencial < [cliente | nombre: "Pepe" - edad: 25 - estado: relajado - dinero: 40  - bebidas: 0 - sin entrada]
+                                        [cliente | nombre: "Juan" - edad: 42 - estado: relajado - dinero: 70  - bebidas: 0 - sin entrada]
+                                        [cliente | nombre: "Maria" - edad: 27 - estado: relajado - dinero: 63  - bebidas: 0 - sin entrada]
+                                        [cliente | nombre: "Antonio" - edad: 55 - estado: relajado - dinero: 140  - bebidas: 0 - sin entrada]
+                                        [cliente | nombre: "Ana" - edad: 16 - estado: relajado - dinero: 25  - bebidas: 0 - sin entrada]
+                                        [cliente | nombre: "Cristina" - edad: 23 - estado: relajado - dinero: 32  - bebidas: 0 - sin entrada]
+                                        [cliente | nombre: "Alejandro" - edad: 15 - estado: relajado - dinero: 12  - bebidas: 0 - sin entrada] 
+                                        [cliente | nombre: "Pedro" - edad: 32 - estado: relajado - dinero: 47  - bebidas: 0 - sin entrada]> } 
+                    { plaza mayor < [trabajador relacciones | nombre: "Billy" - estado: trabajando - dinero: 0 - entradas: 10 - precio: 5]> } 
+                    { local de moda ; aforo: 5 ; precioRefresco: 3 ; precioCopa: 6 ;
+                                                interior< [trabajador puertas | nombre: "Bokencio" - estado: trabajando - dinero: 70 - bebidas: 0]> ; 
+                                                entrada< ListaPersonasVacia >}
+                    { recreativos < ListaPersonasVacia > } .
+
+
+endm
+
+
+*** Comprobaciones de las propiedades atómicas ***
+
+    *** Propiedad A - Comprieba si hay gente en el local de moda
+    red modelCheck(initCheck, prop-alguienEnLocal?) .
+
+    *** Propiedad B - Comprueba si una persona concreta esta en el local de moda
+    red modelCheck(initCheck, prop-estaEnLocal?("Marco")) .    
+
+    *** Propiedad C - Comprueba si una persona concreta esta en el local de moda                              
+    red modelCheck(initCheck, prop-estaEnRecreativos?("Maria")) .
+
+    *** Propiedad D - Comprueba si hay alguien ebrio                                
+    red modelCheck(initCheck, prop-alguienEbrio?) .
+
+    *** Propiedad E - Comprueba si alguien concreto esta ebrio
+    red modelCheck(initCheck,  prop-estaEbrio?("Pedro")) .            
+    red modelCheck(initCheck,  prop-estaEbrio?("Marco")) .            
+
+    *** Propiedad F - Comprueba si hay alguien concreto con entrada
+    red modelCheck(initCheck, prop-alguienConEntrada?("Cristina")) . 
+
+
+
+*** Comprobación de las reglas del ejercicio 3
+
+    ***Regla 1 - Tarde o templano el local se vacía y permanece vacío siempre
+        *** Comprobamos que siempre que haya un cliente en el local de moda, posteriormente se dara la condición
+        *** de que no haya ninguno en el mismo. En el caso de que esta condición se cumpla, querra decir que el 
+        *** local siempre queda vacío. 
+        *** Resultado del ejemplo: true.
+    red modelCheck(init, [] prop-alguienEnLocal? -> (<> ~ prop-alguienEnLocal?) ) .   
+
+    *** Regla 2 - Si una persona concreta pasa a estado ebrio, permanecerá siempre en el
+        *** En el caso de que la persona indicada se encuentre ebria, entonces siempre estara ebia hasta el final de
+        *** la ejecución. En el caso de que esta nunca este ebria, se dará como válido.
+    red modelCheck(init, prop-estaEbrio?("Antonio") -> [] prop-estaEbrio?("Antonio")) .    
+
+    *** Regla 3 - Si una persona esta en el local, entonces tiene entrada
+        *** En el caso de que la persona indicada se encuentre en el local, entonces se comprueba que este tiene
+        *** entrada. En el caso de que no este ne el local, se dará como valido.
+        *** Resultado del ejemplo: True.
+    red modelCheck(init, prop-estaEnLocal?("Pedro") -> prop-alguienConEntrada?("Pedro") ) .   
+
+    *** Regla 4 - Nunca nadie con entrada va a los recreativos
+        *** En el caso de que la persona indicada este ne los recreativos, se comprueba si esta no tiene entrada.
+        *** El resultado de esta operación puede variar según la ejecución, sin embargo, debemos tener en cuenta que en 
+        *** ningún momento se indica como obligatorio que una persona que este en lso recreativos no haya podido comprar
+        *** una entrada anteriormente, luego que el resulatdo sea un contraejemplo sigue siendo valido.   
+    red modelCheck(init, prop-estaEnRecreativos?("Alejandro") -> ~ prop-alguienConEntrada?("Alejandro") ) .
+
+
+
+***( 
+    EJERCICIO 4.
+
+    No podemos convertir en ecuaciones todas aquellas reglas que queramos que gozen de cierta aleatoriedad en el momento de
+    aplicarse su ejecución, por lo que acciones como jugar la partida en los recreativos, la cantidad de bebidas que toma cada uno
+    de los clientes de local de moda o el sitio al cual ir cuando salen inicialmente d ela zona residencial son incambiables.
+
+    El punto princial en el cual podemos aplicar una ecuación es cuanod una persona toma sitio en la cola de la entrada al local. En
+    este ejercicio hemos asumido que la persona se coloca inicialmente al final de la misma y posteriormente aplicamos una regla 
+    cuya función es recolocar la cola, intentando imitar la acción de preguntarse entre si para ver si deben avanzar o no en la misma.
+
+    En el caso de evitar aplciar esta regla de reordenación podríamos o bien aplicar varias reglas distintas para situar a la persona
+    en su posición definitiva una vez se dirige a la cola (lo cual aumentaria el número de reglas y por lo tanto las comprobaciones que
+    deben realziarse en tiempo de ejecucion) o sistuir la misma por una ecuación que se llame cada vez que una perosna nueva va a la cola
+    de entrada y cuya función sua introducir directamente a la persona en la posición final.
+ )

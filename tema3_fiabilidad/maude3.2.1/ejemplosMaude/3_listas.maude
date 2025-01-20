@@ -1,0 +1,119 @@
+
+
+***************************
+*** MODULO PERSONA
+***************************
+fmod PERSONA is
+	pr STRING .
+
+ 	***Tipos de datos
+	sort Persona .
+
+	***Variables
+	vars S S' : String .
+	vars N N' : Nat .
+
+	***Constructores
+	op <_,_> : String Nat -> Persona [ctor] .
+	
+	***Operadores
+	ops max min : Persona Persona -> Persona [comm] .
+		ceq [max] : max(< S, N >, < S', N' >) = < S, N > if N >= N' .
+		ceq [min] : min(< S, N >, < S', N' >) = < S, N > if N <= N' .
+
+	ops _<=_ _>_ : Persona Persona -> Bool .
+		eq < S, N > <= < S', N' > = N <= N' .
+		eq < S, N > > < S', N' > = N > N' .
+
+	ops a b c d : -> Persona .
+		eq a = < "a", 100 > .
+		eq b = < "b", 80 > .
+		eq c = < "c", 150 > .
+		eq d = < "d", 10 > .
+endfm
+
+
+***************************
+*** MODULO LISTA
+***************************
+fmod LISTA is
+	pr PERSONA .
+	
+ 	***Tipos de datos
+	sorts Lista ListaOrd .
+	subsort Persona < ListaOrd < Lista .
+
+	***Variables
+	vars P P' : Persona .
+	vars L L' : Lista .
+	var  LO : ListaOrd .
+
+	***Constructores
+	op lv : -> ListaOrd [ctor] .
+	op __ : Lista Lista -> Lista [ctor assoc id: lv] .
+
+
+	cmb P P' L : ListaOrd
+		if P <= P' /\
+			P' L : ListaOrd .
+
+	op head : Lista ~> Persona .
+		eq head(P L) = P .
+
+	op tail : Lista ~> Lista .
+		eq tail(P L) = L .
+
+	op tam : Lista -> Nat .
+		eq tam(lv) = 0 .
+		eq tam(P L) = s(tam(L)) .
+
+	op esta? : Lista Persona -> Bool .
+		eq esta?(L P L', P) = true .
+		eq esta?(L, P) = false [owise] .
+
+	op ordena : Lista -> Lista .
+		ceq ordena(L P P' L') = ordena(L P' P L')
+			if P > P' .
+		eq ordena(L) = L [owise] .
+
+	op inserta-ord : ListaOrd Persona -> ListaOrd .
+		eq inserta-ord(lv, P) = P .
+		eq inserta-ord(P L, P') = if P <= P'
+			then P inserta-ord(L, P')
+			else P' P L
+			fi .
+
+	op ordena-por-insercion : ListaOrd -> ListaOrd .
+		eq ordena-por-insercion(lv) = lv .
+		ceq ordena-por-insercion(P L) = inserta-ord(L', P)
+			if L' := ordena-por-insercion(L) .
+endfm
+
+eof
+
+*******************
+*** EJEMPLOS
+*******************
+	***Texteo modulo PERSONA
+	red a .
+	red a <= b .
+	red a > b .
+	red max(a, b) .
+
+	***Texteo modulo PERSONA
+	red a b c d .
+	red tail(a b c d) .
+	red head(a b c d) .
+	red tam(a b c d) .
+	red esta?(a b c, d) .
+	red esta?(a b c d, d) .
+	red a d .
+	red d a .
+	red ordena(a b c d) .
+	red inserta-ord(a, b) .
+	red inserta-ord(inserta-ord(inserta-ord(inserta-ord(lv, a), b), c), d) .
+
+	***Texteo modulo CONJUNTO
+	red a, b, c, d .
+
+	***Texteo modulo UNIVERSIDAD

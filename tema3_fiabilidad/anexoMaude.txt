@@ -1,0 +1,79 @@
+*******************************************
+*** DECLARACIONES BASICAS DE MAUDE
+*******************************************
+
+fmod "nombreModulo" is | mod "nombreModulo" is
+    
+    *** Importación de modulos
+    pr "nombreModulo" .
+
+
+    *** Definición de tipos y subtipos de datos
+    sort "nombreTipoDato" .
+    sorts "nombreTipoDato" .
+    subsort "nombreTipoDato" < "nombreTipoDato" .
+    
+    *** Definición de variable
+    var "nombreVariable" "tipoDato" .                                           
+    vars "nombreVariable" "tipoDato" . 
+                                             
+    
+    ***Definición de operadores
+    op "nombreOperador" : "tipoDatosEntrada" -> "tipoDatosSalida" ["atributos"] .
+    ops "nombreOperador" : "tipoDatosEntrada" -> "tipoDatosSalida" ["atributos"] .
+
+
+    ***Definición de ecuaciones
+    eq ["etiqueta"] : "primerMiembro"="segundoMiembro" .
+    
+    ***Definición de ecuaciones condicioneslaes
+    ceq ["etiqueta"] : "primerMiembro"="segundoMiembro"
+        if "expresionCondicional".
+    ceq ["etiqueta"] : "primerMiembro"= if "expresionCondicional"
+        then "expresion"
+        else "expresion"
+        fi.
+
+
+    ***Definición regla de reescritura
+    rl ["etiqueta"] : "nombreConstructor"("datosEntrada") => "datosSalida" .
+	
+    ***Definición regla condicional de reescritura
+    crl ["etiqueta"] : "datosEntrada" => "datosSalida"
+        if "expresionCOndicional" .
+
+endfm | endm
+
+
+*** TIPOS DE ATRIBUTOS 
+***(
+    ctor: Indica que el operador declarado es un constructor
+    assoc: Indica que el operador declarado cumple con la propiedad asociativa.
+    comm: Indica que el operador declarado cumple con la propiedad commutativa.
+    id "nombreElemento": El elemento indicado como parámetro es el elemento identidad.
+    owise: Indicamos que la función se aplica en caso de que las demas funciones del mismo operador no puedan aplicarse.
+)
+
+
+
+***********************************************
+*** DECLARACIONES MAUDE -  FUNCIONES DE LLAMADA
+***********************************************
+
+*** Cargar los módulos y aplicar las órdenes definidas en el fichero indicado
+>> load "nombreFichero.maude" .
+
+*** Aplicar las funciones definidas en los módulos funcionales a la expresion indicada como parámetro
+>> reduce "expresion" .
+>> red "expresion" .
+
+*** Aplicar las funciones definidas en los módulos funcionales a la expresión indicada como parámetro
+>> rewrite ["maxIteraciones"] "expresion" .
+>> rew ["maxIteraciones"] "expresion" .
+
+*** Aplicar las funciones definidas en los módulos funcionales a la expresión indicada como parámetro, forzando su alternancia
+>> frew ["maxIteraciones"] "expresion" .
+
+*** Buscar el camino a seguir para alcanzar el resultado indicado como parámetro
+>> search ["numResultados"] "expresionInicial" "=>*|=>+|=>!" "resultadoBuscado" .
+>> search ["numResultados"] "expresionInicial" "=>*|=>+|=>!" "resultadoBuscado" s.t. "expresionCondicional" .

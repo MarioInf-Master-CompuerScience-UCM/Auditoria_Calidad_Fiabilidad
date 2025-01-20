@@ -1,0 +1,301 @@
+load model-checker .
+
+*** MODULO RED
+***************************
+fmod RED is
+    pr NAT .
+	pr STRING .
+	pr BOOL .
+
+	*** Definicion tipo Sistema
+	sort Sistema .
+		op none : -> Sistema [ctor] .
+		op __ : Sistema Sistema -> Sistema [ctor assoc comm id: none] .
+
+	*** Definicion tipo Localizacion
+	sort Localizacion .
+		subsort Localizacion < Sistema .
+    	op {_|_} : IdLocalizacion Contenido -> Localizacion [ctor] .
+		
+		sort IdLocalizacion .
+			subsort Nat < IdLocalizacion .
+		
+		sort Contenido .
+			op [_;_] : Nodo Msjs -> Contenido [ctor] .
+
+		
+	*** Definición tipo Nodo
+	sort Nodo .
+		***subsort Nodo < Contenido .
+		op vacio : IdNodo -> Nodo [ctor].
+		op extremos : IdNodo IdLocalizacion Estado IdNodos String -> Nodo [ctor].
+		op centro : IdNodo Hash Estado -> Nodo [ctor].
+		
+		sort IdNodo .
+			subsort String < IdNodo < IdNodos .
+			op idNv : -> IdNodo [ctor] .
+		
+		sort IdNodos .
+			subsort String < IdNodos .
+			op __ : IdNodos IdNodos -> IdNodos [ctor assoc comm id: idNv] .
+		
+		sort Hash .
+			op hashv : -> Hash [ctor] .
+			op hashs : Hash Hash -> Hash [ctor assoc comm id: hashRv] .
+
+		sort HashRow .
+			subsort HashRow < Hash .
+			op hashRv : -> HashRow [ctor] .
+			op hashR : IdNodo IdLocalizacion -> HashRow [ctor] .
+			
+		sort Estado .
+			op inactivo : -> Estado [ctor] .
+			op esperando : -> Estado [ctor] .
+			op activo : -> Estado [ctor] .
+
+
+	*** Definicion tipo Msj	
+	sort Msj .
+		***subsort Msj < Msjs .
+		op msjv : -> Msj [ctor] .
+		op msj : String -> Msj [ctor] .
+
+	sort Msjs .
+		subsort Msjs < Contenido .
+		op __ : Msjs Msjs -> Msjs [ctor assoc comm id: msjv] .
+
+	sort Minfo .
+		subsort Minfo < Msj < Msjs .
+		op infov : -> Minfo [ctor] .
+		op info : IdLocalizacion IdLocalizacion IdNodo -> Minfo [ctor] .
+
+	sort Mrespuesta .
+		subsort Mrespuesta < Msj < Msjs .
+		op respv : -> Mrespuesta [ctor] .
+		op res : IdNodo -> Mrespuesta [ctor] .
+
+	sort Mto .
+		subsort Mto < Msj < Msjs .
+		op tov : -> Mto [ctor] .
+		op to : IdNodo String -> Mto [ctor] .
+
+
+	*** DEFINICIÓN DE OPERACIONES ***
+	var sis : Sistema .
+	var loc : Localizacion .
+	var msInfo : Minfo .
+	var msj : Msj .
+	var msjs msjs' : Msjs .
+
+	var idN : IdNodo .
+	var idNs_amigos : IdNodos .
+	var est : Estado .
+	var idL idL_cen : IdLocalizacion .
+	var msg : String .
+	var msjs_nodo : String .
+	var msjs_loc : Msjs .
+	var hash : Hash .
+
+	op numNodos : Sistema -> Nat .
+		eq numNodos(none) = 0 .
+		eq numNodos(loc sis) = 1 + numNodos(sis) . 
+
+	op numExtremos : Sistema -> Nat .
+		eq numExtremos(none) = 0 .
+		eq numExtremos( { idL | [ extremos( idN, idL_cen, est, idNs_amigos, msjs_nodo ) ; msjs_loc ] } sis) = 1 + numExtremos(sis) .
+		eq numExtremos( { idL | [ centro( idN, hash, est ) ; msjs_loc ]} sis) = 0 + numExtremos(sis) .
+
+
+endfm
+
+
+
+*** MODULO COMPORTAMIENTO
+***************************
+mod COMPORTAMIENTO is
+	pr RED .
+	pr STRING .
+	pr NAT .
+	pr STRING .
+
+	var idN idN' : IdNodo .
+	var idNa idNa' : IdNodo .
+	var idNs_amigos idNs_amigos' : IdNodos .
+	var est : Estado .
+	var idL idL_cen idLa idLa' : IdLocalizacion .
+	var msg : String .
+
+	var hash : Hash .
+	var hashr hashr' : HashRow .
+
+	var msjs_nodo msjs_nodo' : String .
+	var msjs_loc msjs_loc' msjs_loc2 : Msjs .
+	var mInfo : Minfo .
+	var mRes : Mrespuesta .
+	var mto : Mto .
+
+	*** REGLAS EJERCICIO 9
+	*** Un nodo extremo inactivo genera un mensaje información y pasa a estar activo
+  	rl [extremo-genera-Info] : 
+		{ idL | [ extremos( idN, idL_cen, inactivo, idNs_amigos, msjs_nodo ) ; msjs_loc ] } 
+		=> 
+		{ idL | [ extremos( idN, idL_cen, esperando, idNs_amigos, msjs_nodo ) ; msjs_loc info( idL_cen, idL, idN ) ] } . 
+
+
+	*** REGLAS EJERCICIO 10
+	*** El mensaje de información es enviado desde el nodo extremo al nodo centro
+	crl [extremo-envia-Info-centro-hasVacio?False] :
+		{ idL | [ extremos( idN, idL_cen, esperando, idNs_amigos, msjs_nodo ) ; msjs_loc mInfo ]} 
+		{ idL_cen | [ centro( idN', hash, est ) ; msjs_loc2 ]}
+		=> 
+		{ idL | [ extremos( idN, idL_cen, esperando, idNs_amigos, msjs_nodo ) ; msjs_loc res(idN)]}  
+		{ idL_cen | [ centro( idN', hashs( hash, hashR( idN, idL ) ), activo ) ; msjs_loc2 mInfo ]}
+		if hash =/= hashv .
+
+	crl [extremo-envia-Info-centro-hasVacio?True] : 
+		{ idL | [ extremos( idN, idL_cen, esperando, idNs_amigos, msjs_nodo ) ; msjs_loc mInfo ]} 
+		{ idL_cen | [ centro( idN', hash, est ) ; msjs_loc2 ]}
+		=> 
+		{ idL | [ extremos( idN, idL_cen, esperando, idNs_amigos, msjs_nodo ) ; msjs_loc res( idN )]}  
+		{ idL_cen | [ centro( idN', hashR( idN, idL ) , activo ) ; msjs_loc2 mInfo ]}
+		if hash == hashv .
+
+
+	*** REGLAS EJERCICIO 11
+	*** Acuatualización de estado cuando un extremo recibe un mensaje de respuesta
+   	rl [extremo-pasa-a-activo] : 
+		{ idL | [ extremos( idN, idL_cen, esperando, idNs_amigos, msjs_nodo ) ; msjs_loc mRes ]}
+		=> 
+		{ idL | [ extremos( idN, idL_cen, activo, idNs_amigos, msjs_nodo ) ; msjs_loc mRes ]} .
+
+
+	*** REGLAS EJERCICIO 12 y 13
+	*** Los nodos extremo mandan un mensjae to_:_ al nodo centro, con destino a  uno de sus amigos
+   	crl [enviarMensajeTo-centro] : 
+		{ idL | [ extremos( idN, idL_cen, activo, idNs_amigos idNa, msjs_nodo ) ; msjs_loc]}  
+		{ idL_cen | [ centro( idN', hash, activo ) ; msjs_loc2 ]}
+		=> 
+		{ idL | [ extremos( idN, idL_cen, activo, idNs_amigos, msjs_nodo ) ; msjs_loc]}  
+		{ idL_cen | [ centro( idN', hash, activo ) ; msjs_loc2 to(idNa, "hola") ]}
+		if idNa =/= idNv .
+
+	*** El nodo centro reenvía el mensaje to_:_ al nodo extremo destino, obteniendo el id de su localción de la tabla hash
+  	crl [reenviarMensajeTo-extremo] : 
+		{ idL_cen | [ centro( idN', hashs( hashr, hashR(idNa, idLa), hashr'), activo ) ; msjs_loc to( idNa', msg) ]}
+		{ idLa | [ extremos( idNa, idL_cen, activo, idNs_amigos, msjs_nodo ) ; msjs_loc2 ]} 
+		=> 
+		{ idL_cen | [ centro( idN', hashs( hashr, hashR( idNa, idLa ), hashr' ), activo ) ; msjs_loc ]}
+		{ idLa | [ extremos( idNa, idL_cen, activo, idNs_amigos, msjs_nodo + msg ) ; msjs_loc2 ]}  
+		if idNa == idNa' .
+
+endm
+
+
+*** MODULO EJEMPLO
+***************************
+mod EJEMPLO is
+	pr RED .
+	pr COMPORTAMIENTO .
+	pr NAT .
+	pr STRING .
+
+	op init : -> Sistema .
+		eq init = 	{ 0 | [ centro("nodoCen-0", hashv, inactivo) ; msjv ] }
+					{ 1 | [ extremos("nodoExt-1", 0, inactivo, "nodoExt-2" "nodoExt-3", "" ) ; msjv ] }
+					{ 2 | [ extremos("nodoExt-2", 0, inactivo, "nodoExt-1" "nodoExt-3", "" ) ; msjv ] }
+					{ 3 | [ extremos("nodoExt-3", 0, inactivo, "nodoExt-1" "nodoExt-2", "" ) ; msjv ] } .
+***( Resultado:
+	{0 | [centro("nodoCen-0", hashs(hashR("nodoExt-1", 1), hashR("nodoExt-2", 2), hashR("nodoExt-3", 3)), activo) ; info(0, 1, "nodoExt-1")info(0, 2, "nodoExt-2") info(0, 3, "nodoExt-3")]} 
+	{1 | [extremos("nodoExt-1", 0, activo, idNv, "holahola") ; res("nodoExt-1")]} 
+	{2 | [extremos("nodoExt-2", 0, activo, idNv, "holahola") ; res("nodoExt-2")]} 
+	{3 | [extremos("nodoExt-3", 0, activo, idNv, "holahola") ; res("nodoExt-3")]}
+	)
+endm 
+
+*** EJERCICIO 15
+rew init .
+search init =>* rest:Sistema s.t. numNodos(rest:Sistema) =/= 4 .
+
+
+
+*** MODULO PROPS
+***************************
+mod PROPS is
+	pr SATISFACTION .
+	pr COMPORTAMIENTO .
+	pr STRING .
+	pr NAT .
+
+	subsort Sistema < State .
+
+	var idN idNa idN' : IdNodo .
+	var idNs_amigos : IdNodos .
+	var est : Estado .
+	var idL idL_cen idLa idLa' : IdLocalizacion .
+	var msg : String .
+	var hash : Hash .
+	var msjs_nodo msjs_nodo' : String .
+	var msjs_loc : Msjs .
+	
+	var rest : Sistema .
+	var num : Nat .
+	var mto : Mto .
+
+	***EJERCICIO 17
+
+	*** Comprueba si existe un nodo concreto.
+	op existeNodo? : IdNodo -> Prop [ctor] .
+		eq { idL | [ centro(idN, hash, est) ; msjs_loc ] } rest |= existeNodo?(idN) = true .
+		eq { idL | [ extremos( idN, idL_cen, est, idNs_amigos, msjs_nodo ) ; msjs_loc ]} rest |= existeNodo?(idN) = true .
+
+	*** Comprueba si el primer nodo tiene como amigo al segundo.
+	op esAmigo? : IdNodo IdNodo -> Prop [ctor] .
+		eq { idL | [ extremos( idN, idL_cen, est, idNs_amigos idNa, msjs_nodo ) ; msjs_loc ]} rest |= esAmigo?(idN, idNa) = true .
+	
+	*** Comprueba si existe algun mensaje To para el nodo indicado.
+	op tieneTo? : IdNodo -> Prop [ctor] .
+		eq { idL | [ centro(idN, hash, est) ; msjs_loc to(idN', msg) ] } rest |= tieneTo?(idN') = true .
+
+	*** Comprueba si existen tantos nodos como los indicados.
+	op hayXNodos? : Nat -> Prop [ctor] .
+		eq rest |= hayXNodos?(num) = numNodos(rest) == num .
+		 
+	*** Comprueba si existen tantos extremos como los indicados.
+	op hayXExtremos? : Nat -> Prop [ctor] .
+		eq rest |= hayXExtremos?(num) = numExtremos(rest) == num .
+
+endm
+
+
+*** MODULO TEST
+***************************
+mod TEST is
+	pr MODEL-CHECKER .
+	pr LTL-SIMPLIFIER .
+	pr PROPS .
+	pr STRING .
+	pr NAT .
+
+ 	op init : -> Sistema .
+		eq init = 	{ 0 | [ centro("nodoCen-0", hashv, inactivo) ; msjv ] }
+					{ 1 | [ extremos("nodoExt-1", 0, inactivo, "nodoExt-2" "nodoExt-3", "" ) ; msjv ] }
+					{ 2 | [ extremos("nodoExt-2", 0, inactivo, "nodoExt-1" "nodoExt-3", "" ) ; msjv ] }
+					{ 3 | [ extremos("nodoExt-3", 0, inactivo, "nodoExt-1" "nodoExt-2", "" ) ; msjv ] } .
+
+endm
+
+
+
+*** EJERCICIO 18
+
+*** La cantidad de nodos no varía.
+red modelCheck(init, [] hayXNodos?(4)) .
+
+*** La cantidad de extemos es una dada.
+red modelCheck(init, [] hayXExtremos?(3)) .
+
+*** Si un nodo existe y otro lo tiene como amigo, este le acaba mandando un mensaje
+red modelCheck(init, ([] existeNodo?("nodoExt-2") /\ <> esAmigo?("nodoExt-1", "nodoExt-2")) -> <> tieneTo?("nodoExt-2") ) .
+
+*** Cualquier mensaje acaba desapareciendo
+red modelCheck(init, <> tieneTo?("nodoExt-2") -> ~ tieneTo?("nodoExt-2")  ) . 

@@ -1,0 +1,55 @@
+fmod RED is
+ pr NAT .
+
+ sorts Localizacion Sistema Contenidos Nodo Msj Socket ListaMsj .
+ subsort Localizacion Socket < Sistema .
+ *** Define los subtipos entre Contenidos y Nodo y Msj
+ *** Define los subtipos entre Msj y ListaMsj
+
+ op none : -> Sistema [ctor] .
+ op {_|_} : Nat Contenidos -> Localizacion [ctor] .
+ op __ : Sistema Sistema -> Sistema [ctor assoc comm id: none] .
+
+ op <_|_;_|_> : Nat ListaMsj ListaMsj Nat -> Socket [ctor] .
+
+ *** Termina de definir constructores
+endfm
+
+mod COMPORTAMIENTO is
+ *** Importa los modulos correspondientes
+
+ *** Define el comportamiento de la red mediante reglas
+endm
+
+mod EJEMPLO is
+ *** Importa los modulos correspondientes
+
+ op init : -> Sistema .
+ *** Define un término inicial sobre el que probar las propiedades siguiendo el enunciado
+ *** red init = { 0 | ... } *** Dentro habrá un nodo
+ ***            { 1 | ... }
+ ***            ...
+ ***            < 0 | ... ; ... | 1 > *** Socket que une 0 y 1. Los puntos suspensivos serán listas vacías
+endm
+
+rew init .
+
+*** search init ...
+
+load model-checker
+
+mod PROPS is
+ *** Importa los modulos correspondientes
+
+ *** Define las propiedades
+endm
+
+mod TEST is
+ *** Importa los modulos correspondientes
+endm
+
+eof
+
+*** Define y comprueba las propiedades
+
+red modelCheck(init, ...) .

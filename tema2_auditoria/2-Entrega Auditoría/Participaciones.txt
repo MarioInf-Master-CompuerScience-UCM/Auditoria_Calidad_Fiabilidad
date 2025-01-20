@@ -1,0 +1,28 @@
+Destinatario: Alejandro
+
+Entidad auditoda: Mario
+
+Alcance: Bogdan y Mario
+
+Comparabilidad: Mario
+
+Salvedades: José, Alejandro, Bogdan y Mario
+
+Incumplimientos..:
+	Contrato: Alejando y Bogdan
+	Plan de desarrollo: José y Mario
+	Requisitos: Bogdan y Alejando
+	Diseño: Bogdan, Jose, Mario y Alejandro
+	Implementación: Bogdan y Alejandro
+	Seguimiento: José y Mario
+	Documentación: Bogdan y Alejandro
+
+Énfasis: José y Mario
+
+Informe de gestión: José y Mario
+
+Resumen: José y Mario
+
+Resultado: José, Mario, Alejando y Bogdan
+
+Firma y Fecha: Bogdan

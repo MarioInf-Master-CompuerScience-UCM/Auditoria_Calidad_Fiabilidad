@@ -1,0 +1,56 @@
+fmod PILA is
+    pr NAT .
+
+    ***Tipos de datos
+    sort Pila .
+
+    ***Variables
+    var N : Nat .
+    var P : Pila .
+
+    ***Constructores
+    op pila-vacia : -> Pila [ctor] .
+    op apila : Nat Pila -> Pila [ctor] .
+
+
+    op desapila : Pila -> Pila .
+        eq desapila(pila-vacia) = pila-vacia .
+        eq desapila(apila(N, P)) = P .
+
+
+    op cima : Pila ~> Nat .
+        eq cima(apila(N, P)) = N .
+    endfm
+
+
+
+fmod PILA-EXT is
+    pr PILA .
+
+    vars N N' : Nat .
+    var  P : Pila .
+
+    op esta? : Pila Nat -> Bool .
+        eq esta?(pila-vacia, N) = false .
+        eq esta?(apila(N, P), N') = 
+            if N == N'
+                then true
+                else esta?(P, N')
+            fi .
+
+    ***( Otras posibilidades:
+        - Con ecuaciones condicionales:
+        eq esta?(pila-vacia, N) = false .
+        eq esta?(apila(N, P), N) = true .
+        ceq esta?(apila(N, P), N') = esta?(P, N')
+        if N =/= N' .
+        - Con el atributo otherwise.
+        eq esta?(pila-vacia, N) = false .
+        eq esta?(apila(N, P), N) = true .
+        eq esta?(apila(N, P), N') = esta?(P, N') [owise] .
+    )
+
+    op esVacia? : Pila -> Bool .
+    eq esVacia?(pila-vacia) = true .
+    eq esVacia?(P) = true [owise] .
+endfm

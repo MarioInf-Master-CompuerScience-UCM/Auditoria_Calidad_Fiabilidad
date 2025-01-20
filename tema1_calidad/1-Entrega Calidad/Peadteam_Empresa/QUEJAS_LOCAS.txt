@@ -1,0 +1,13 @@
+-Nombre mal puesto en algunos campos (el nombre original: Es peadteam) aparece en el titulo, en reuinidos, expone 1º, en las clausulas primera, cuarta, quinta, sexta y septima.
+-En la sexata clausula no entendemos bien la ultima parte, queremos los derechos totales del software y nos comprometos a poner que el software fue desarrollado por 
+Blackboard Devs S.L. pero nada mas.
+-Anexo tecnico: 1º Error logico: El sistema debe contar con tres tipos de usuario y planteias 4 a continuación. 
+-Anexo tecnico: 2º .d no tener antecedentes en general en vez de solo de violencia.
+-Anexo tecnico: 3º Mantener el formato del punto 3 (en algunos pones a, b, c y en otro 1, 2).
+-Anexo tecnico: 20º No queremos dejar que los tonques se pueda transformar a dinero, solos se pueden comprar tokens y usarse para hacer las transacciones en la pagina.
+-Anexo tecnico: 27º Pedimos eliminarlo, queremos que los tokens sea la moneda usada para todo. 
+-Anexo tecnico2: La elecion la dejamos al equipo de desarrollo pero preferimos la opcion 2 para la app.
+-Anexo tecnico2: La elecion la dejamos al equipo de desarrollo pero preferimos la opcion 2 para la tienda.
+-Anexo tecnico2: La elecion la dejamos al equipo de desarrollo pero preferimos AWS como servicio cloud.
+-Recursos humanos: En la lista aparece el especialista de ecomerce y no consideramos que tendira que estar en esa lista ya que no forma en la suma total del sueldo.
+Preferimos que aparezca en un apartado nuevo.

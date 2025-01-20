@@ -1,0 +1,54 @@
+fmod ARBIN is
+    pr NAT .
+
+    *** Tipos de datos y variables
+    sort Arbin .
+    vars A A' : Arbin .
+    vars N N' C V C' V' : Nat .
+
+    *** Constructores
+    op vacio : -> Arbin [ctor] .
+    op _[_,_]_ : Arbin Nat Nat Arbin -> Arbin [ctor] .
+
+
+    *** Operaciones
+        *** Suma dos valores dados
+        op merge : Nat Nat -> Nat .
+            eq merge(N, N') = N + N' .
+
+        *** Inserta el nodo dado en el arbol binario según su clave
+        op inserta : Nat Nat Arbin -> Arbin .
+            eq inserta(C, V, vacio) = vacio [C, V] vacio .
+            ceq inserta(C, V, A [C', V'] A') = A [C, merge(V', V)] A'
+                if C == C' .
+            ceq inserta(C, V, A [C', V'] A') = inserta(C, V, A) [C', V'] A'
+                if C < C' .
+            ceq inserta(C, V, A [C', V'] A') = A [C', V'] inserta(C, V, A')
+                if C > C' .
+
+        *** Devuelve el valor asociado a la clave indicada, dentro del arbol indicado
+        op busca : Nat Arbin ~> Nat .
+            ceq busca(C, A [C', V'] A') = V'
+                if C == C' .
+            ceq busca(C, A [C', V'] A') = busca(C, A)
+                if C < C' .
+            ceq busca(C, A [C', V'] A') = busca(C, A')
+                if C > C' .
+endfm
+
+eof
+
+**************************
+*** REALIZACIÓN DE PRUEBAS
+**************************
+red inserta(3,3, inserta(2,2, inserta(7,7, inserta(0, 0, vacio)))) .
+
+red inserta(0, 5, inserta(3,3, inserta(2,2, inserta(7,7, inserta(0, 0, vacio))))) .
+
+red inserta(3,12, inserta(0, 5, inserta(3,3, inserta(2,2, inserta(7,7, inserta(0, 0, vacio)))))) .
+
+red busca(0, vacio[0,5]((vacio[2,2](vacio[3,15]vacio))[7,7]vacio)) .
+
+red busca(7, vacio[0,5]((vacio[2,2](vacio[3,15]vacio))[7,7]vacio)) .
+
+red busca(1, vacio[0,5]((vacio[2,2](vacio[3,15]vacio))[7,7]vacio)) .

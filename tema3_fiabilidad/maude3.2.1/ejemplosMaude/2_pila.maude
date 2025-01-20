@@ -1,0 +1,40 @@
+fmod PILA is
+	pr NAT .
+
+	***Tipo de datos
+	sort Pila .
+	var N : Nat .
+	var P : Pila .
+
+	***Constructores
+	op pila-vacia : -> Pila [ctor] .
+	op apila : Nat Pila -> Pila [ctor] .
+
+	*** Operadores y funciones
+	op desapila : Pila -> Pila .
+		eq desapila(pila-vacia) = pila-vacia .
+		eq desapila(apila(N, P)) = P .
+
+	op cima : Pila ~> Nat .
+		eq cima(apila(N, P)) = N .
+endfm
+		
+
+
+*******************
+*** EJEMPLOS
+*******************
+
+*** La pila con solo 7 se escribe apila(7, pila-vacia).
+red apila(7, pila-vacia) .
+
+*** La pila con 3 en la cima y 7 debajo se escribe apila(3, apila(7, pila-vacia))
+red apila(3, apila(7, pila-vacia)) .
+
+*** Si desapilamos nos quedamos con la anterior:
+red desapila(apila(3, apila(7, pila-vacia))) .
+
+*** La cima de la pila desapilada es 7
+red cima(desapila(apila(3, apila(7, pila-vacia)))) .
+
+

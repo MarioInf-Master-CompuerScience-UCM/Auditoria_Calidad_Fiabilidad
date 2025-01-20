@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?><project name="PEADTEAM" company="" webLink="http://peadteam.com" view-date="2022-10-01" view-index="0" gantt-divider-location="599" resource-divider-location="489" version="3.2.3246" locale="es_ES">
+    <description>
+        <![CDATA[Aplicación Web y Movil para el cuidado de mascotas
+Tienda Online de productos para mascotas]]>
+    </description>
+    <view zooming-state="default:8" id="gantt-chart">
+        <field id="tpd3" name="Nombre" width="340" order="0"/>
+        <field id="tpd4" name="Fecha de inicio" width="127" order="1"/>
+        <field id="tpd5" name="Fecha de fin" width="131" order="2"/>
+        <option id="filter.completedTasks" value="false"/>
+    </view>
+    <view id="resource-table">
+        <field id="0" name="Nombre" width="296" order="0"/>
+        <field id="1" name="Función" width="174" order="1"/>
+    </view>
+    <!-- -->
+    <calendars>
+        <day-types>
+            <day-type id="0"/>
+            <day-type id="1"/>
+            <default-week id="1" name="default" sun="1" mon="0" tue="0" wed="0" thu="0" fri="0" sat="1"/>
+            <only-show-weekends value="false"/>
+            <overriden-day-types/>
+            <days/>
+        </day-types>
+    </calendars>
+    <tasks empty-milestones="true">
+        <taskproperties>
+            <taskproperty id="tpd0" name="type" type="default" valuetype="icon"/>
+            <taskproperty id="tpd1" name="priority" type="default" valuetype="icon"/>
+            <taskproperty id="tpd2" name="info" type="default" valuetype="icon"/>
+            <taskproperty id="tpd3" name="name" type="default" valuetype="text"/>
+            <taskproperty id="tpd4" name="begindate" type="default" valuetype="date"/>
+            <taskproperty id="tpd5" name="enddate" type="default" valuetype="date"/>
+            <taskproperty id="tpd6" name="duration" type="default" valuetype="int"/>
+            <taskproperty id="tpd7" name="completion" type="default" valuetype="int"/>
+            <taskproperty id="tpd8" name="coordinator" type="default" valuetype="text"/>
+            <taskproperty id="tpd9" name="predecessorsr" type="default" valuetype="text"/>
+        </taskproperties>
+        <task id="1" name="Aplicación Web y Móvil" color="#8cb6ce" meeting="false" start="2022-10-03" duration="120" complete="0" thirdDate="2022-10-03" thirdDate-constraint="0" expand="true">
+            <task id="3" name="Gestión de los usuarios" color="#8cb6ce" meeting="false" start="2022-10-03" duration="20" complete="0" thirdDate="2022-10-03" thirdDate-constraint="0" expand="true">
+                <depend id="4" type="2" difference="0" hardness="Strong"/>
+            </task>
+            <task id="4" name="Gestión de búsqueda &amp; chat" color="#8cb6ce" meeting="false" start="2022-10-31" duration="25" complete="0" thirdDate="2022-10-03" thirdDate-constraint="0" expand="true">
+                <depend id="5" type="2" difference="0" hardness="Strong"/>
+            </task>
+            <task id="5" name="Gestión de las reservas &amp; calendarios" color="#8cb6ce" meeting="false" start="2022-12-05" duration="25" complete="0" thirdDate="2022-09-26" thirdDate-constraint="0" expand="true">
+                <depend id="6" type="2" difference="0" hardness="Strong"/>
+            </task>
+            <task id="6" name="Gestión de calificaciones" color="#8cb6ce" meeting="false" start="2023-01-09" duration="15" complete="0" thirdDate="2022-09-26" thirdDate-constraint="0" expand="true">
+                <depend id="7" type="2" difference="0" hardness="Strong"/>
+            </task>
+            <task id="7" name="Gestión de collares" color="#8cb6ce" meeting="false" start="2023-01-30" duration="15" complete="0" thirdDate="2022-09-26" thirdDate-constraint="0" expand="true">
+                <depend id="8" type="2" difference="0" hardness="Strong"/>
+            </task>
+            <task id="8" name="Resolución de Bugs y publicación" color="#8cb6ce" meeting="false" start="2023-02-20" duration="20" complete="0" thirdDate="2022-09-26" thirdDate-constraint="0" expand="true"/>
+        </task>
+        <task id="2" name="Tienda" color="#8cb6ce" meeting="false" start="2022-10-03" duration="20" complete="0" thirdDate="2022-10-03" thirdDate-constraint="0" expand="true">
+            <task id="9" name="Creación tienda Online" color="#8cb6ce" meeting="false" start="2022-10-03" duration="5" complete="0" thirdDate="2022-10-03" thirdDate-constraint="0" expand="true">
+                <depend id="10" type="2" difference="0" hardness="Strong"/>
+            </task>
+            <task id="10" name="Gestión de la tienda online" color="#8cb6ce" meeting="false" start="2022-10-10" duration="5" complete="0" thirdDate="2022-10-03" thirdDate-constraint="0" expand="true">
+                <depend id="11" type="2" difference="0" hardness="Strong"/>
+            </task>
+            <task id="11" name="Ingesta de Productos y Categorías" color="#8cb6ce" meeting="false" start="2022-10-17" duration="5" complete="0" thirdDate="2022-10-03" thirdDate-constraint="0" expand="true">
+                <depend id="12" type="2" difference="0" hardness="Strong"/>
+            </task>
+            <task id="12" name="Validación métodos de pago y configuraciones extras" color="#8cb6ce" meeting="false" start="2022-10-24" duration="5" complete="0" thirdDate="2022-10-03" thirdDate-constraint="0" expand="true"/>
+        </task>
+    </tasks>
+    <resources>
+        <resource id="0" name="Especialista eCommerce" function="Default:0" contacts="" phone="">
+            <rate name="standard" value="1600"/>
+        </resource>
+        <resource id="1" name="Alejandro" function="1" contacts="" phone="">
+            <rate name="standard" value="2000"/>
+        </resource>
+        <resource id="2" name="Jose" function="1" contacts="" phone="">
+            <rate name="standard" value="2000"/>
+        </resource>
+        <resource id="3" name="Mario" function="3" contacts="" phone="">
+            <rate name="standard" value="1800"/>
+        </resource>
+        <resource id="4" name="Bogdan" function="2" contacts="" phone="">
+            <rate name="standard" value="2000"/>
+        </resource>
+        <resource id="5" name="Jaime" function="4" contacts="" phone="">
+            <rate name="standard" value="1500"/>
+        </resource>
+    </resources>
+    <allocations>
+        <allocation task-id="9" resource-id="0" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="10" resource-id="0" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="11" resource-id="0" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="12" resource-id="0" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="3" resource-id="1" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="4" resource-id="1" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="5" resource-id="1" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="6" resource-id="1" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="7" resource-id="1" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="8" resource-id="1" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="3" resource-id="2" function="1" responsible="false" load="100.0"/>
+        <allocation task-id="4" resource-id="2" function="1" responsible="false" load="100.0"/>
+        <allocation task-id="5" resource-id="2" function="1" responsible="false" load="100.0"/>
+        <allocation task-id="6" resource-id="2" function="1" responsible="false" load="100.0"/>
+        <allocation task-id="7" resource-id="2" function="1" responsible="false" load="100.0"/>
+        <allocation task-id="8" resource-id="2" function="1" responsible="false" load="100.0"/>
+        <allocation task-id="3" resource-id="3" function="3" responsible="false" load="100.0"/>
+        <allocation task-id="4" resource-id="3" function="3" responsible="false" load="100.0"/>
+        <allocation task-id="5" resource-id="3" function="3" responsible="false" load="100.0"/>
+        <allocation task-id="6" resource-id="3" function="3" responsible="false" load="100.0"/>
+        <allocation task-id="7" resource-id="3" function="3" responsible="false" load="100.0"/>
+        <allocation task-id="8" resource-id="3" function="3" responsible="false" load="100.0"/>
+        <allocation task-id="3" resource-id="4" function="2" responsible="false" load="100.0"/>
+        <allocation task-id="4" resource-id="4" function="2" responsible="false" load="100.0"/>
+        <allocation task-id="5" resource-id="4" function="2" responsible="false" load="100.0"/>
+        <allocation task-id="6" resource-id="4" function="2" responsible="false" load="100.0"/>
+        <allocation task-id="7" resource-id="4" function="2" responsible="false" load="100.0"/>
+        <allocation task-id="8" resource-id="4" function="2" responsible="false" load="100.0"/>
+        <allocation task-id="3" resource-id="5" function="4" responsible="false" load="100.0"/>
+        <allocation task-id="4" resource-id="5" function="4" responsible="false" load="100.0"/>
+        <allocation task-id="5" resource-id="5" function="4" responsible="false" load="100.0"/>
+        <allocation task-id="6" resource-id="5" function="4" responsible="false" load="100.0"/>
+        <allocation task-id="7" resource-id="5" function="4" responsible="false" load="100.0"/>
+        <allocation task-id="8" resource-id="5" function="4" responsible="false" load="100.0"/>
+    </allocations>
+    <vacations/>
+    <previous/>
+    <roles roleset-name="Default"/>
+    <roles roleset-name="SoftwareDevelopment"/>
+    <roles>
+        <role id="1" name="Desarrollador Frontend"/>
+        <role id="2" name="Desarrollador Backend"/>
+        <role id="3" name="Especialista Base de Datos"/>
+        <role id="4" name="Desarrollador Aplicaciones Moviles"/>
+        <role id="5" name="Especialista eCommerce"/>
+    </roles>
+</project>

@@ -1,0 +1,16 @@
+{
+    "folders": [
+        {
+            "path": "tema1_calidad"
+        },
+        {
+            "path": "tema2_auditoria"
+        },
+        {
+            "path": "tema3_fiabilidad"
+        },
+        {
+            "path": "."
+        },
+    ]
+}
