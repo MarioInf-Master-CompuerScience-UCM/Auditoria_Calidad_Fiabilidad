@@ -15,14 +15,6 @@ Programa de la asignatura:
 - Fiabilidad de sistemas: seguridad y viveza. Algoritmos de model-checking. Herramientas de model-checking. Model checking simbólico.
 - Testing. Cobertura de pruebas. Técnicas automáticas de generación de casos de test. Herramientas de testing.
 
-Contenidos mínimos:
-
-- Calidad informática: estándares de calidad, factores de calidad, métricas de calidad.
-- Auditoría informática: estándares y directrices de auditoría, análisis y gestión de riesgos, proceso de auditoría.
-- Fiabilidad de sistemas (reliability). Técnicas para comprobar sistemáticamente la fiabilida de sistemas: testing, model-checking, especificación y verificación. - Comprobación de seguridad y viveza. Cobertura de pruebas. Modelización de sistemas.
-- Herramientas para comprobar (semi-)automáticamente la fiabilidad de sistemas.
-
-
 ## Licencia de uso
 
 <p xmlns:cc="http://creativecommons.org/ns#" >This work is licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">CC BY-NC-SA 4.0<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/nc.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/sa.svg?ref=chooser-v1" alt=""></a></p>
