@@ -1,4 +1,4 @@
-# Auditoria, calidad y fiabilidad informáticas
+# Auditoría, calidad y fiabilidad informáticas
 
 ![Idioma: Español](https://img.shields.io/badge/Idioma-Español-green.svg)
 ![Idioma: Español](https://img.shields.io/badge/Año_académico-2022/2023-blue.svg)
